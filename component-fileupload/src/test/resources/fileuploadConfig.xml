@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configs>
+	<fileupload configKey="userFile">
+		<uploadPath>/upload/userFile</uploadPath>
+		<fileMaxSize>1024000</fileMaxSize>
+	</fileupload>
+</configs>

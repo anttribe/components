@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE digester-rules PUBLIC  
+   "-//Jakarta Apache //DTD digester-rules XML V1.0//EN"  
+   "digester-rules.dtd">
+<digester-rules>
+	<object-create-rule pattern="configs" classname="java.util.ArrayList" />
+	<pattern value="configs/fileupload">
+		<object-create-rule
+			classname="org.anttribe.component.fileupload.config.UploaderConfig" />
+		<set-properties-rule />
+		<bean-property-setter-rule pattern="uploadPath"
+			property="uploadPath" />
+		<bean-property-setter-rule pattern="fileMaxSize"
+			property="fileMaxSize" />
+		<set-next-rule methodname="add" />
+	</pattern>
+</digester-rules>
