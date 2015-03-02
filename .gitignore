@@ -1,5 +1,9 @@
 *.class
 
+**/.settings/
+*.classpath
+*.project
+
 # maven output directory
 **/target/
 
