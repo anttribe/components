@@ -353,7 +353,7 @@ public class FileUploader
             }
             
             // 判断文件是否存在，如果不存在或者不是一个目录，创建文件目录
-            if (!absoluteDirectory.exists() || !absoluteDirectory.isDirectory())
+            if (!absoluteDirectory.exists() || absoluteDirectory.isDirectory())
             {
                 try
                 {
