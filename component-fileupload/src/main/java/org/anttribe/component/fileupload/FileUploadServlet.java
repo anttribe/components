@@ -19,13 +19,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.anttribe.component.common.entity.Result;
 import org.anttribe.component.dataparser.DataParser;
 import org.anttribe.component.dataparser.Parser;
 import org.anttribe.component.fileupload.config.UploaderConfig;
 import org.anttribe.component.fileupload.constants.Keys;
 import org.anttribe.component.fileupload.constants.ResultCode;
 import org.anttribe.component.fileupload.entity.FileItemInfo;
-import org.anttribe.component.fileupload.entity.Result;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;

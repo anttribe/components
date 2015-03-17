@@ -1,11 +1,9 @@
 *.class
 
 **/.settings/
-*.classpath
-*.project
-
-# maven output directory
 **/target/
+**/*.project
+**/*.classpath
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

@@ -15,10 +15,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.anttribe.component.common.entity.Result;
 import org.anttribe.component.dataparser.DataParser;
 import org.anttribe.component.dataparser.Parser;
 import org.anttribe.component.fileupload.constants.Keys;
-import org.anttribe.component.fileupload.entity.Result;
 import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

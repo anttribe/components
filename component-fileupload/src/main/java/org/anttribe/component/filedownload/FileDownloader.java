@@ -8,6 +8,7 @@
 package org.anttribe.component.filedownload;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.anttribe.component.filedownload.constants.ResultCode;
+import org.anttribe.component.io.ZipFileUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,16 @@ public class FileDownloader
      * LOGGER
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(FileDownloader.class);
+    
+    /**
+     * 缓存文件位置
+     */
+    private static final String TEMP_FILE_FIRECTORY = System.getProperty("user.dir") + "/temp";
+    
+    /**
+     * 默认下载文件后缀
+     */
+    private static final String DEFAULT_DOWNLOAD_FILE_SUBFIX = ".zip";
     
     /**
      * 下载的文件列表
@@ -54,11 +67,45 @@ public class FileDownloader
     public ResultCode download(HttpServletRequest request, HttpServletResponse response, String[] filenames)
     {
         ResultCode resultCode = this.parseDownloadFiles(request, filenames);
-        if (ResultCode.SUCCESS == resultCode)
+        if (ResultCode.SUCCESS == resultCode && !CollectionUtils.isEmpty(downloadFiles))
         {
             // 进行文件下载：如果是多个文件，包装成zip文件进行下载; 单个文件，就直接下载
+            if (downloadFiles.size() == 1)
+            {
+                this.doDownloadFile(request, response, downloadFiles.get(0));
+            }
+            else
+            {
+                try
+                {
+                    // 根据当前日期生成文件名
+                    String downloadFilename = "";
+                    // 包装成zip文件
+                    ZipFileUtils.zipCompress(downloadFiles.toArray(new File[downloadFiles.size()]),
+                        TEMP_FILE_FIRECTORY,
+                        downloadFilename + DEFAULT_DOWNLOAD_FILE_SUBFIX);
+                    this.doDownloadFile(request, response, new File(TEMP_FILE_FIRECTORY + File.separator
+                        + downloadFilename + DEFAULT_DOWNLOAD_FILE_SUBFIX));
+                }
+                catch (IOException e)
+                {
+                    LOGGER.error("While compress download files to zip, get error: {}.", e);
+                    resultCode = ResultCode.COMPRESS_TOZIP_ERROR;
+                }
+            }
         }
         return resultCode;
+    }
+    
+    /**
+     * 
+     * @param request
+     * @param downloadFile
+     * @return
+     */
+    private ResultCode doDownloadFile(HttpServletRequest request, HttpServletResponse response, File downloadFile)
+    {
+        return ResultCode.SUCCESS;
     }
     
     /**
@@ -120,5 +167,10 @@ public class FileDownloader
             }
         }
         return absoluteDirectory;
+    }
+    
+    public Throwable getCause()
+    {
+        return cause;
     }
 }
