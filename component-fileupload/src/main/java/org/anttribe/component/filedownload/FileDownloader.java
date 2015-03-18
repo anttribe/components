@@ -7,9 +7,16 @@
  */
 package org.anttribe.component.filedownload;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -17,9 +24,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.anttribe.component.filedownload.constants.ResultCode;
+import org.anttribe.component.filedownload.entity.Range;
+import org.anttribe.component.io.FileUtils;
 import org.anttribe.component.io.ZipFileUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +55,11 @@ public class FileDownloader
      * 默认下载文件后缀
      */
     private static final String DEFAULT_DOWNLOAD_FILE_SUBFIX = ".zip";
+    
+    /**
+     * 默认下载文件MIME Type
+     */
+    private static final String DEFAULT_CONTENT_TYPE = "application/force-download";
     
     /**
      * 下载的文件列表
@@ -79,7 +94,7 @@ public class FileDownloader
                 try
                 {
                     // 根据当前日期生成文件名
-                    String downloadFilename = "";
+                    String downloadFilename = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
                     // 包装成zip文件
                     ZipFileUtils.zipCompress(downloadFiles.toArray(new File[downloadFiles.size()]),
                         TEMP_FILE_FIRECTORY,
@@ -98,14 +113,116 @@ public class FileDownloader
     }
     
     /**
+     * 下载文件
      * 
-     * @param request
-     * @param downloadFile
-     * @return
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
+     * @param downloadFile File
+     * @return ResultCode
      */
     private ResultCode doDownloadFile(HttpServletRequest request, HttpServletResponse response, File downloadFile)
     {
-        return ResultCode.SUCCESS;
+        int fileLength = (int)downloadFile.length();
+        // 设置响应头
+        response.setContentType(DEFAULT_CONTENT_TYPE);
+        response.setContentLength(fileLength);
+        response.setHeader("Content-Disposition", "attachment;filename=" + downloadFile.getName());
+        
+        int begin = 0;
+        int end = fileLength - 1;
+        // 从请求中获取上次下载文件的位置
+        Range range = this.parseDownloadRange(request);
+        if (null != range)
+        {
+            if (null != range.getBegin())
+            {
+                begin = range.getBegin().intValue();
+            }
+            
+            response.setHeader("Accept-Ranges", "bytes");
+            // 206
+            response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+            String contentRangeValue = String.format("bytes %d-%d/%d", begin, end, fileLength);
+            response.setHeader("Content-Range", contentRangeValue);
+        }
+        
+        try
+        {
+            this.doDownloadFile(response, downloadFile, begin, end);
+            
+            return ResultCode.SUCCESS;
+        }
+        catch (IOException e)
+        {
+            cause = e;
+            if (e instanceof FileNotFoundException)
+            {
+                return ResultCode.FILE_NOT_FOUND;
+            }
+            return ResultCode.FILE_IO_EXCEPTION;
+        }
+    }
+    
+    /**
+     * 实际的文件下载操作，将文件写出响应，即输入流
+     * 
+     * @param response HttpServletResponse
+     * @param downloadFile File
+     * @param begin int
+     * @param end int
+     * @throws IOException
+     */
+    private void doDownloadFile(HttpServletResponse response, File downloadFile, int begin, int end)
+        throws IOException
+    {
+        InputStream in = null;
+        OutputStream out = null;
+        try
+        {
+            in = new BufferedInputStream(new FileInputStream(downloadFile));
+            out = new BufferedOutputStream(response.getOutputStream());
+            
+            // 跳过begin个字节
+            in.skip(begin);
+            
+            int len = 0;
+            int left = end - begin + 1;
+            byte[] buff = new byte[1024];
+            // 将文件内容写入输出流
+            while ((len = in.read(buff)) != -1 && left > 0)
+            {
+                out.write(buff, 0, len);
+                left = left - len;
+            }
+            out.flush();
+        }
+        finally
+        {
+            FileUtils.closeStream(in, out);
+        }
+    }
+    
+    /**
+     * 从请求中获取上次下载文件的位置
+     * 
+     * @param request HttpServletRequest
+     * @return Range
+     */
+    public Range parseDownloadRange(HttpServletRequest request)
+    {
+        // 获取RANGE请求头
+        String rangeHeaderValue = request.getHeader("RANGE");
+        if (StringUtils.isEmpty(rangeHeaderValue))
+        {
+            return null;
+        }
+        Range range = new Range();
+        if (rangeHeaderValue.indexOf("-") != -1)
+        {
+            rangeHeaderValue = rangeHeaderValue.substring(0, rangeHeaderValue.indexOf("-"));
+        }
+        range.setBegin(Integer.getInteger(rangeHeaderValue));
+        return range;
     }
     
     /**

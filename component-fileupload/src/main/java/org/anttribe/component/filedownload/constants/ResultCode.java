@@ -16,10 +16,7 @@ package org.anttribe.component.filedownload.constants;
 public enum ResultCode
 {
     SUCCESS("FD00001", "成功"), INVALID_REQUEST_PARAM("FD00002", "请求参数错误"), FILE_NOT_FOUND("FD00003", "文件不存在错误"), COMPRESS_TOZIP_ERROR(
-        "FD00005", "zip压缩文件失败"), SIZE_EXCEEDED("FU00002", "文件总大小超过限制"), FILE_SIZE_EXCEEDED("FU00003", "单个文件大小超过限制"), INVALID_FILE_TYPE(
-        "FU00004", "文件类型不正确"), INVALID_CONTENT_TYPE("FU00005", "请求表单类型不正确"), FILE_UPLOAD_IO_EXCEPTION("FU00006",
-        "文件上传 IO 错误"), OTHER_PARSE_REQUEST_EXCEPTION("FU00007", "解析上传请求其他异常"), WRITE_FILE_FAIL("FU00008", "文件写入失败"), INVALID_UPLOAD_PATH(
-        "FU00009", "文件的保存路径不正确");
+        "FD00004", "zip压缩文件失败"), FILE_IO_EXCEPTION("FD00005", "文件IO异常");
     
     /**
      * 结果码
