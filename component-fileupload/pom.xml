@@ -25,6 +25,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.anttribe.components</groupId>
+			<artifactId>component-lang</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.anttribe.components</groupId>
 			<artifactId>component-io</artifactId>
 			<version>${project.version}</version>
 		</dependency>
