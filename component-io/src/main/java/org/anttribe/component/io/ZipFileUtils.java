@@ -13,6 +13,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 
@@ -236,6 +238,38 @@ public final class ZipFileUtils
                     zipCompress(srcRootDirectory, subFile, zos);
                 }
             }
+        }
+    }
+    
+    public static void main(String[] args)
+    {
+        try
+        {
+            URL url = new URL("http://www.weste.net/2010/10-19/73082.html");
+            
+            ZipOutputStream zos =
+                new ZipOutputStream(new CheckedOutputStream(new FileOutputStream("F:\\test.zip"), new CRC32()));
+            ZipEntry entry = new ZipEntry("73082.html");
+            zos.putNextEntry(entry);
+            // 将被压缩文件的内容输出到压缩文件中
+            BufferedInputStream bis = new BufferedInputStream(url.openStream());
+            int len = 0;
+            byte[] buff = new byte[1024];
+            while ((len = bis.read(buff, 0, buff.length)) != -1)
+            {
+                zos.write(buff, 0, len);
+            }
+            bis.close();
+            zos.closeEntry();
+            zos.close();
+        }
+        catch (MalformedURLException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
         }
     }
 }

@@ -13,7 +13,7 @@ public class TestZipFileUtils
     {
         try
         {
-            ZipFileUtils.zipCompress("F:\\交行写作系统客户需求.txt", "F:\\", "test.zip");
+            ZipFileUtils.zipCompress("/upload", "D:\\", "test.zip");
         }
         catch (IOException e)
         {
@@ -26,7 +26,7 @@ public class TestZipFileUtils
     {
         try
         {
-            ZipFileUtils.zipCompress(new String[] {"F:\\test\\test\\新建文本文档.txt", "F:\\交行写作系统客户需求.txt"}, "F:\\", "test.zip");
+            ZipFileUtils.zipCompress(new String[] {"F:\\Anttribe项目\\TeamWritten-团队写作工具\\详细设计"}, "F:\\", "test.zip");
         }
         catch (IOException e)
         {
