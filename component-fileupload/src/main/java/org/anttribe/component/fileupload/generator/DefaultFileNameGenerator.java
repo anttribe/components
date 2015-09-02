@@ -1,6 +1,6 @@
 /*
  * 文  件   名: DefaultFileNameGenerator.java
- * 版         本: component-fileupload(Anttribe). All rights reserved
+ * 版         本: (Anttribe)webim-base-infra. All rights reserved
  * 描         述: <描述>
  * 修   改  人: zhaoyong
  * 修改时 间: 2014年12月29日
