@@ -77,8 +77,8 @@ public class XmlDataParser extends DataParser
         }
         catch (Exception e)
         {
-            logger.error("Error to parse InputStream. cause: {}", e);
-            throw new DataParserException("Error to parser InputStream.");
+            logger.error("Error to parse InputStream, cause: {}", e);
+            throw new DataParserException("Error to parser InputStream", e);
         }
     }
     
